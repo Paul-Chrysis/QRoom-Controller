@@ -1,5 +1,0 @@
-#build spring container
-docker build -t qroomcontroller-spring-mongo:1.0 .
-
-#run spring container linked with mongodb container
-docker run -p 8080:8080 --name QRoomController-spring --link QRoomController:mongo -d qroomcontroller-spring-mongo:1.0

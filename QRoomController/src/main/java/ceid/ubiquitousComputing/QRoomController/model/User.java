@@ -1,7 +1,8 @@
 package ceid.ubiquitousComputing.QRoomController.model;
 
-import lombok.*;
-import org.bson.types.ObjectId;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -11,16 +12,14 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @NoArgsConstructor
 public class User {
     @Id
-    private ObjectId mongoId;
-    private int id;
+    private String mongoId;
     private boolean isAdmin;
     private String username;
     private String firstName;
     private String lastName;
 
 
-    public User(int id, boolean isAdmin, String username,String firstName, String lastName) {
-        this.id = id;
+    public User(boolean isAdmin, String username,String firstName, String lastName) {
         this.isAdmin = isAdmin;
         this.username = username;
         this.firstName = firstName;
