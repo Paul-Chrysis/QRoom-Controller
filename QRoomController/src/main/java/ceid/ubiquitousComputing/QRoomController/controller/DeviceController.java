@@ -4,18 +4,15 @@ import ceid.ubiquitousComputing.QRoomController.model.Device;
 import ceid.ubiquitousComputing.QRoomController.model.Widget;
 import ceid.ubiquitousComputing.QRoomController.service.DeviceService;
 
+import jakarta.annotation.Nullable;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 import java.util.Optional;
 
-@RequestMapping("API/v1/device")
+@RequestMapping("api/v1/device")
 @RestController
 @AllArgsConstructor
 public class DeviceController {
@@ -33,8 +30,7 @@ public class DeviceController {
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<?> setWidgetState(@PathVariable("id") String id, @RequestBody Widget widget){
-         return deviceService.updateDeviceState(id, widget);
+    public ResponseEntity<?> setWidgetState(@RequestHeader("Authorization") String token,@PathVariable("id") String id,@Nullable @RequestBody Widget widget){
+        return deviceService.updateDeviceState(token ,id, widget);
     }
-
 }
