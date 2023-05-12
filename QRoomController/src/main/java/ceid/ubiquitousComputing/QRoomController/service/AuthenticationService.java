@@ -1,5 +1,6 @@
 package ceid.ubiquitousComputing.QRoomController.service;
 
+import ceid.ubiquitousComputing.QRoomController.exception.UserDoesNotExist;
 import ceid.ubiquitousComputing.QRoomController.model.AuthenticationRequest;
 import ceid.ubiquitousComputing.QRoomController.model.AuthenticationResponse;
 import ceid.ubiquitousComputing.QRoomController.model.RegisterRequest;
@@ -44,9 +45,8 @@ public class AuthenticationService {
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
-        System.out.println("im in");
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(),request.getPassword()));
-        var user = userRepository.findUserByUsername(request.getUsername()).orElseThrow();
+        var user = userRepository.findUserByUsername(request.getUsername()).orElseThrow(() -> new UserDoesNotExist(request.getUsername()));
         System.out.println(user.getUsername());
         var jwtToken = jwtService.generateToken(user);
         return AuthenticationResponse.builder().token(jwtToken).build();
