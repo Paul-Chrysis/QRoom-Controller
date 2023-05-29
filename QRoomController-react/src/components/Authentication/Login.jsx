@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
 import React from "react";
 import axios from "../../api/axios";
+import Logo from "../thirdLayer/Logo";
 
 const AUTHENTICATE_URL = "/api/v1/auth/authenticate";
 
@@ -10,7 +11,7 @@ const Login = () => {
   const { setAuth } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const from = location.state?.from?.pathname || "/scanQR";
+  const from = location.state?.from?.pathname || "/";
   const userRef = useRef();
   const errorRef = useRef();
 
@@ -29,7 +30,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const responce = await axios.post(
+      const response = await axios.post(
         AUTHENTICATE_URL,
         JSON.stringify({
           username: user,
@@ -40,20 +41,22 @@ const Login = () => {
           withCredentials: true,
         }
       );
-      console.log(JSON.stringify(responce.data));
-      console.log(JSON.stringify(responce.accessToken));
-      console.log(JSON.stringify(responce));
-      const token = responce?.data?.token;
+      console.log(JSON.stringify(response.data));
+      console.log(JSON.stringify(response.accessToken));
+      console.log(JSON.stringify(response));
+      const token = response?.data?.token;
       setAuth({ user, pwd, token });
       setUser("");
       setPwd("");
       navigate(from, { replace: true });
     } catch (err) {
-      if (!err?.responce) {
-        setErrorMsg("No Server Responce");
-      } else if (err.responce?.status === 400) {
+      if (!err?.response) {
+        setErrorMsg("No Server Response");
+      } else if (err.response?.status === 400) {
         setErrorMsg("Missing username or password");
-      } else if (err.responce?.status === 401) {
+      } else if (err.response?.status === 403) {
+        setErrorMsg("Account does not exist");
+      } else if (err.response?.status === 401) {
         setErrorMsg("Anauthorized");
       } else {
         setErrorMsg("Login Failed");
@@ -62,41 +65,45 @@ const Login = () => {
   };
 
   return (
-    <section>
-      <p ref={errorRef} className={errorMsg ? "errmsg" : "hide"}>
-        {errorMsg}
-      </p>
-      <h1>Login</h1>
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="username">Username:</label>
-        <input
-          type="text"
-          id="username"
-          ref={userRef}
-          autoComplete="off"
-          onChange={(e) => setUser(e.target.value)}
-          value={user}
-          required
-        />
+    <div className="wrapper">
+      <Logo />
+      <section className="auth-form">
+        <p ref={errorRef} className={errorMsg ? "errmsg" : "hide"}>
+          {errorMsg}
+        </p>
+        <h1>Login</h1>
 
-        <label htmlFor="password">Password:</label>
-        <input
-          type="password"
-          id="password"
-          onChange={(e) => setPwd(e.target.value)}
-          value={pwd}
-          required
-        />
+        <form onSubmit={handleSubmit}>
+          <label htmlFor="username">Username:</label>
+          <input
+            type="text"
+            id="username"
+            ref={userRef}
+            autoComplete="off"
+            onChange={(e) => setUser(e.target.value)}
+            value={user}
+            required
+          />
 
-        <button>Sign In</button>
-      </form>
-      <p>
-        Need an Account?
-        <span className="line">
-          <Link to="/register">Sign Up</Link>
-        </span>
-      </p>
-    </section>
+          <label htmlFor="password">Password:</label>
+          <input
+            type="password"
+            id="password"
+            onChange={(e) => setPwd(e.target.value)}
+            value={pwd}
+            required
+          />
+
+          <button>Sign In</button>
+        </form>
+        <p>
+          Need an Account?
+          <span className="line">
+            <Link to="/register">Sign Up</Link>
+          </span>
+        </p>
+      </section>
+    </div>
   );
 };
 

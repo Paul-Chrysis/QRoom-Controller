@@ -1,12 +1,12 @@
 import Icon from "../fifthLayer/Icon";
 import Command from "../fifthLayer/Command";
 
-const Gesture = () => {
+const Gesture = ({ type, gType }) => {
   return (
-    <>
-      <Icon />
-      <Command />
-    </>
+    <div className="PossibleGesture">
+      <Icon gType={gType} />
+      <Command type={type} gType={gType} />
+    </div>
   );
 };
 

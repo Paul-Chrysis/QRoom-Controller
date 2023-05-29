@@ -1,12 +1,16 @@
 import { Outlet } from "react-router-dom";
 
 import React from "react";
+import Navbar from "../secondLayer/navbar/Navbar";
 
 const Layout = () => {
   return (
-    <main className="App">
-      <Outlet />
-    </main>
+    <>
+      <Navbar />
+      <main className="App">
+        <Outlet />
+      </main>
+    </>
   );
 };
 

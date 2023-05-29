@@ -1,7 +1,11 @@
 import Camera from "../thirdLayer/Camera";
 
 function ScanQRBody() {
-  return <Camera />;
+  return (
+    <section className="auth-form">
+      <Camera />
+    </section>
+  );
 }
 
 export default ScanQRBody;

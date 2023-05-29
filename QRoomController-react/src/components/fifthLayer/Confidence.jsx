@@ -1,5 +1,5 @@
-const Confidence = () => {
-  return <div>Confidence</div>;
+const Confidence = ({ confidence }) => {
+  return <p>{confidence}</p>;
 };
 
 export default Confidence;

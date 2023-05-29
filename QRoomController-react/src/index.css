@@ -2,6 +2,8 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  /* border: 1px solid red; */
+  /* text-decoration: none; */
 }
 
 html {
@@ -15,16 +17,18 @@ body {
   background-color: azure;
 }
 
-.App {
+.App,
+.wrapper {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
-  padding: 1rem 0.5rem;
+  min-height: 80vh;
+  padding: 0 0.5rem;
+  margin-bottom: 10px;
 }
 
-section {
+.auth-form {
   width: 100%;
   max-width: 420px;
   min-height: 400px;
@@ -33,6 +37,8 @@ section {
   justify-content: flex-start;
   padding: 1rem;
   background-color: rgba(0, 0, 0, 0.4);
+  border-radius: 10px;
+  border: 10px solid darkslategray;
 }
 
 form {
@@ -112,4 +118,180 @@ button {
 
 .line {
   display: inline-block;
+}
+
+img {
+  margin: 10px;
+  height: 8vh;
+}
+
+.deviceName {
+  color: azure;
+  background-color: darkslategray;
+  font-size: xx-large;
+  display: flex;
+  justify-content: center;
+  padding: 10px 0;
+  margin-bottom: 20px;
+  border-radius: 50px;
+}
+
+.widget {
+  margin: 10px;
+  border-radius: 10px;
+  padding: 10px;
+  background-color: grey;
+}
+
+.widgetName {
+  width: 50%;
+  background-color: #fff;
+  color: #000;
+  text-transform: uppercase;
+  display: flex;
+  justify-content: center;
+
+  border-radius: 10px;
+}
+
+.switch {
+  margin: 0;
+  position: relative;
+  display: inline-block;
+  width: 170px;
+  height: 40px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 32px;
+  width: 50px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+}
+
+input:checked + .slider {
+  background-color: darkslategray;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px darkslategray;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(42px);
+  -ms-transform: translateX(42px);
+  transform: translateX(112px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50px;
+}
+
+.onOffSwitch {
+  padding: 10px;
+  gap: 10px;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.switchWrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.progress {
+  height: 40px;
+  margin: 10px 0;
+  border-radius: 50px;
+  width: auto;
+  background-color: #ccc;
+}
+
+.progress-bar {
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  border-radius: 50px;
+  color: azure;
+  background-color: darkslategray;
+}
+
+.camera-sec {
+  overflow: hidden;
+}
+
+.PossibleGestures {
+  background-color: #ccc;
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+}
+
+.PossibleGesture {
+  padding: 5px;
+  color: darkslategray;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 25%;
+  border-radius: 5px;
+  border: 2px solid darkslategray;
+  text-align: center;
+}
+
+.cameraContainer {
+  position: relative;
+}
+
+.gestureFeedback {
+  width: 100px;
+  font-size: larger;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 10px;
+  justify-content: center;
+  text-align: center;
+  background-color: #ccc;
+  color: darkslategray;
+  position: absolute;
+  top: 0;
+  right: 0;
+  border: 1px solid darkslategray;
+  z-index: 10;
 }

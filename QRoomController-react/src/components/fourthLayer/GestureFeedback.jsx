@@ -1,11 +1,11 @@
 import RecognisedGesture from "../fifthLayer/RecognisedGesture";
 import Confidence from "../fifthLayer/Confidence";
 
-const GestureFeedback = () => {
+const GestureFeedback = ({ gesture, confidence }) => {
   return (
     <>
-      <RecognisedGesture />
-      <Confidence />
+      <RecognisedGesture gesture={gesture} />
+      <Confidence confidence={confidence} />
     </>
   );
 };

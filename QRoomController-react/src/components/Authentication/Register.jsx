@@ -8,6 +8,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import useAuth from "../../hooks/useAuth";
 import axios from "../../api/axios";
+import Logo from "../thirdLayer/Logo";
 
 const USER_REGEX = /^[a-zA-Z][a-zA-Z0-9-_]{3,23}$/;
 const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
@@ -97,7 +98,7 @@ const Register = () => {
       return;
     }
     try {
-      const responce = await axios.post(
+      const response = await axios.post(
         REGISTER_URL,
         JSON.stringify({
           username: user,
@@ -107,20 +108,19 @@ const Register = () => {
           password: pwd,
         }),
         {
-          headers: { "content-type": "application/json" },
           withCredentials: true,
         }
       );
-      console.log(JSON.stringify(responce.data));
-      console.log(JSON.stringify(responce.token));
-      console.log(JSON.stringify(responce));
-      const token = responce?.data?.token;
+      console.log(JSON.stringify(response.data));
+      console.log(JSON.stringify(response.token));
+      console.log(JSON.stringify(response));
+      const token = response?.data?.token;
       setAuth({ user, pwd, token });
       navigate(from, { replace: true });
     } catch (err) {
-      if (!err?.responce) {
-        setErrorMsg("No Server Responce");
-      } else if (err.responce?.status == 409) {
+      if (!err?.response) {
+        setErrorMsg("No Server Response");
+      } else if (err.response?.status == 409) {
         setErrorMsg("Username Taken");
       } else {
         setErrorMsg("Registration Failed");
@@ -129,201 +129,210 @@ const Register = () => {
   };
 
   return (
-    <section>
-      <p ref={errorRef} className={errorMsg ? "errmsg" : "hide"}>
-        {errorMsg}
-      </p>
-      <h1>Register</h1>
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="username">
-          Username:
-          <span className={validName ? "valid" : "hide"}>
-            <FontAwesomeIcon icon={faCheck} />
-          </span>
-          <span className={validName || !user ? "hide" : "invalid"}>
-            <FontAwesomeIcon icon={faTimes} />
-          </span>
-        </label>
-        <input
-          type="text"
-          id="username"
-          ref={userRef}
-          autoComplete="off"
-          onChange={(e) => setUser(e.target.value)}
-          required
-          onFocus={() => setUserFocus(true)}
-          onBlur={() => setUserFocus(false)}
-        />
-        <p
-          id="uidnote"
-          className={userFocus && user && !validName ? "instructions" : "hide"}
-        >
-          <FontAwesomeIcon icon={faInfoCircle} />
-          4 to 23 characters.
-          <br />
-          Must begin with a letter.
-          <br />
-          Letters, numbers, underscores and hyphens allowed.
+    <div className="wrapper">
+      <Logo />
+      <section className="auth-form">
+        <p ref={errorRef} className={errorMsg ? "errmsg" : "hide"}>
+          {errorMsg}
         </p>
+        <h1>Register</h1>
+        <form onSubmit={handleSubmit}>
+          <label htmlFor="username">
+            Username:
+            <span className={validName ? "valid" : "hide"}>
+              <FontAwesomeIcon icon={faCheck} />
+            </span>
+            <span className={validName || !user ? "hide" : "invalid"}>
+              <FontAwesomeIcon icon={faTimes} />
+            </span>
+          </label>
+          <input
+            type="text"
+            id="username"
+            ref={userRef}
+            autoComplete="off"
+            onChange={(e) => setUser(e.target.value)}
+            required
+            onFocus={() => setUserFocus(true)}
+            onBlur={() => setUserFocus(false)}
+          />
+          <p
+            id="uidnote"
+            className={
+              userFocus && user && !validName ? "instructions" : "hide"
+            }
+          >
+            <FontAwesomeIcon icon={faInfoCircle} />
+            4 to 23 characters.
+            <br />
+            Must begin with a letter.
+            <br />
+            Letters, numbers, underscores and hyphens allowed.
+          </p>
 
-        <label htmlFor="firstname">
-          First name:
-          <span className={validFirst ? "valid" : "hide"}>
-            <FontAwesomeIcon icon={faCheck} />
+          <label htmlFor="firstname">
+            First name:
+            <span className={validFirst ? "valid" : "hide"}>
+              <FontAwesomeIcon icon={faCheck} />
+            </span>
+            <span className={validFirst || !first ? "hide" : "invalid"}>
+              <FontAwesomeIcon icon={faTimes} />
+            </span>
+          </label>
+          <input
+            type="text"
+            id="firstname"
+            autoComplete="off"
+            onChange={(e) => setFirst(e.target.value)}
+            required
+            onFocus={() => setFirstFocus(true)}
+            onBlur={() => setFirstFocus(false)}
+          />
+          <p
+            id="nnote"
+            className={
+              firstFocus && first && !validFirst ? "instructions" : "hide"
+            }
+          >
+            <FontAwesomeIcon icon={faInfoCircle} />
+            3 to 15 characters.
+            <br />
+            Must begin with an upercase letter and continue with lowercase
+            letters.
+            <br />
+            Numbers, and special characters are not allowed.
+          </p>
+
+          <label htmlFor="lastname">
+            Last name:
+            <span className={validLast ? "valid" : "hide"}>
+              <FontAwesomeIcon icon={faCheck} />
+            </span>
+            <span className={validLast || !last ? "hide" : "invalid"}>
+              <FontAwesomeIcon icon={faTimes} />
+            </span>
+          </label>
+          <input
+            type="text"
+            id="lastname"
+            autoComplete="off"
+            onChange={(e) => setLast(e.target.value)}
+            required
+            onFocus={() => setLastFocus(true)}
+            onBlur={() => setLastFocus(false)}
+          />
+          <p
+            id="lnote"
+            className={
+              lastFocus && last && !validLast ? "instructions" : "hide"
+            }
+          >
+            <FontAwesomeIcon icon={faInfoCircle} />
+            3 to 15 characters.
+            <br />
+            Must begin with an upercase letter and continue with lowercase
+            letters.
+            <br />
+            Numbers, and special characters are not allowed.
+          </p>
+
+          <label htmlFor="email">
+            Email:
+            <span className={validEmail ? "valid" : "hide"}>
+              <FontAwesomeIcon icon={faCheck} />
+            </span>
+            <span className={validEmail || !email ? "hide" : "invalid"}>
+              <FontAwesomeIcon icon={faTimes} />
+            </span>
+          </label>
+          <input
+            type="email"
+            id="email"
+            autoComplete="off"
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            onFocus={() => setEmailFocus(true)}
+            onBlur={() => setEmailFocus(false)}
+          />
+          <p
+            id="enote"
+            className={
+              lastFocus && last && !validLast ? "instructions" : "hide"
+            }
+          >
+            <FontAwesomeIcon icon={faInfoCircle} />
+            Must be valid email.
+          </p>
+
+          <label htmlFor="password">
+            Password:
+            <span className={validPwd ? "valid" : "hide"}>
+              <FontAwesomeIcon icon={faCheck} />
+            </span>
+            <span className={validPwd || !pwd ? "hide" : "invalid"}>
+              <FontAwesomeIcon icon={faTimes} />
+            </span>
+          </label>
+          <input
+            type="password"
+            id="password"
+            onChange={(e) => setPwd(e.target.value)}
+            required
+            onFocus={() => setPwdFocus(true)}
+            onBlur={() => setPwdFocus(false)}
+          />
+          <p
+            id="pwdnote"
+            className={pwdFocus && pwd && !validPwd ? "instructions" : "hide"}
+          >
+            <FontAwesomeIcon icon={faInfoCircle} />
+            8 to 24 characters.
+            <br />
+            Must include uppercase and lowercase letters, a number and a special
+            character.
+            <br />
+            Allowed special characters: !,@,#,$,%.
+          </p>
+
+          <label htmlFor="confirm_pwd">
+            Confirm password:
+            <span className={validMatch && matchPwd ? "valid" : "hide"}>
+              <FontAwesomeIcon icon={faCheck} />
+            </span>
+            <span className={validMatch || !matchPwd ? "hide" : "invalid"}>
+              <FontAwesomeIcon icon={faTimes} />
+            </span>
+          </label>
+          <input
+            type="password"
+            id="confirm_pwd"
+            onChange={(e) => setMatchPwd(e.target.value)}
+            required
+            onFocus={() => setMatchFocus(true)}
+            onBlur={() => setMatchFocus(false)}
+          />
+          <p
+            id="matchnote"
+            className={matchFocus && !validMatch ? "instructions" : "hide"}
+          >
+            <FontAwesomeIcon icon={faInfoCircle} />
+            Must mutch the first password field.
+          </p>
+
+          <button
+            disabled={!validName || !validPwd || !validMatch ? true : false}
+          >
+            Sign Up
+          </button>
+        </form>
+        <p>
+          Already registered?
+          <span className="line">
+            <Link to="/login">Sign In</Link>
           </span>
-          <span className={validFirst || !first ? "hide" : "invalid"}>
-            <FontAwesomeIcon icon={faTimes} />
-          </span>
-        </label>
-        <input
-          type="text"
-          id="firstname"
-          autoComplete="off"
-          onChange={(e) => setFirst(e.target.value)}
-          required
-          onFocus={() => setFirstFocus(true)}
-          onBlur={() => setFirstFocus(false)}
-        />
-        <p
-          id="nnote"
-          className={
-            firstFocus && first && !validFirst ? "instructions" : "hide"
-          }
-        >
-          <FontAwesomeIcon icon={faInfoCircle} />
-          3 to 15 characters.
-          <br />
-          Must begin with an upercase letter and continue with lowercase
-          letters.
-          <br />
-          Numbers, and special characters are not allowed.
         </p>
-
-        <label htmlFor="lastname">
-          Last name:
-          <span className={validLast ? "valid" : "hide"}>
-            <FontAwesomeIcon icon={faCheck} />
-          </span>
-          <span className={validLast || !last ? "hide" : "invalid"}>
-            <FontAwesomeIcon icon={faTimes} />
-          </span>
-        </label>
-        <input
-          type="text"
-          id="lastname"
-          autoComplete="off"
-          onChange={(e) => setLast(e.target.value)}
-          required
-          onFocus={() => setLastFocus(true)}
-          onBlur={() => setLastFocus(false)}
-        />
-        <p
-          id="lnote"
-          className={lastFocus && last && !validLast ? "instructions" : "hide"}
-        >
-          <FontAwesomeIcon icon={faInfoCircle} />
-          3 to 15 characters.
-          <br />
-          Must begin with an upercase letter and continue with lowercase
-          letters.
-          <br />
-          Numbers, and special characters are not allowed.
-        </p>
-
-        <label htmlFor="email">
-          Email:
-          <span className={validEmail ? "valid" : "hide"}>
-            <FontAwesomeIcon icon={faCheck} />
-          </span>
-          <span className={validEmail || !email ? "hide" : "invalid"}>
-            <FontAwesomeIcon icon={faTimes} />
-          </span>
-        </label>
-        <input
-          type="email"
-          id="email"
-          autoComplete="off"
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          onFocus={() => setEmailFocus(true)}
-          onBlur={() => setEmailFocus(false)}
-        />
-        <p
-          id="enote"
-          className={lastFocus && last && !validLast ? "instructions" : "hide"}
-        >
-          <FontAwesomeIcon icon={faInfoCircle} />
-          Must be valid email.
-        </p>
-
-        <label htmlFor="password">
-          Password:
-          <span className={validPwd ? "valid" : "hide"}>
-            <FontAwesomeIcon icon={faCheck} />
-          </span>
-          <span className={validPwd || !pwd ? "hide" : "invalid"}>
-            <FontAwesomeIcon icon={faTimes} />
-          </span>
-        </label>
-        <input
-          type="password"
-          id="password"
-          onChange={(e) => setPwd(e.target.value)}
-          required
-          onFocus={() => setPwdFocus(true)}
-          onBlur={() => setPwdFocus(false)}
-        />
-        <p
-          id="pwdnote"
-          className={pwdFocus && pwd && !validPwd ? "instructions" : "hide"}
-        >
-          <FontAwesomeIcon icon={faInfoCircle} />
-          8 to 24 characters.
-          <br />
-          Must include uppercase and lowercase letters, a number and a special
-          character.
-          <br />
-          Allowed special characters: !,@,#,$,%.
-        </p>
-
-        <label htmlFor="confirm_pwd">
-          Confirm password:
-          <span className={validMatch && matchPwd ? "valid" : "hide"}>
-            <FontAwesomeIcon icon={faCheck} />
-          </span>
-          <span className={validMatch || !matchPwd ? "hide" : "invalid"}>
-            <FontAwesomeIcon icon={faTimes} />
-          </span>
-        </label>
-        <input
-          type="password"
-          id="confirm_pwd"
-          onChange={(e) => setMatchPwd(e.target.value)}
-          required
-          onFocus={() => setMatchFocus(true)}
-          onBlur={() => setMatchFocus(false)}
-        />
-        <p
-          id="matchnote"
-          className={matchFocus && !validMatch ? "instructions" : "hide"}
-        >
-          <FontAwesomeIcon icon={faInfoCircle} />
-          Must mutch the first password field.
-        </p>
-
-        <button
-          disabled={!validName || !validPwd || !validMatch ? true : false}
-        >
-          Sign Up
-        </button>
-      </form>
-      <p>
-        Already registered?
-        <span className="line">
-          <Link to="/login">Sign In</Link>
-        </span>
-      </p>
-    </section>
+      </section>
+    </div>
   );
 };
 

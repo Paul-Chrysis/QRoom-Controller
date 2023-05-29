@@ -1,0 +1,13 @@
+docker build -t qroomcontroller-spring:1.0 .
+
+
+#######
+
+
+docker run -p 8080:8080 --name qroomcontroller --link QRoomController-mongo -d qroomcontroller-spring:1.0
+
+
+######
+
+
+docker logs qroomcontroller

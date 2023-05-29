@@ -1,5 +1,5 @@
-import Widget from "../fourthLayer/Widget";
-import OnOffWidget from "../fourthLayer/OnOffWidget";
+import WidgetName from "../fifthLayer/WidgetName";
+import WidgetState from "../fifthLayer/WidgetState";
 
 // const INITIAL_STATE = {
 //   deviceType: "lights",
@@ -21,17 +21,14 @@ import OnOffWidget from "../fourthLayer/OnOffWidget";
 //   ],
 // };
 
-const WidgetList = ({ widgets, adminOnly, isActive }) => {
-  return widgets.length <= 1 ? (
-    <div>No Widget to see</div>
-  ) : (
-    <>
-      <OnOffWidget isActive={isActive} />
-      {widgets.map((widget) => (
-        <Widget key={widget.widget_label} widgetState={widget} />
-      ))}
-    </>
+const OnOffWidget = ({ isActive }) => {
+  // admin only for later
+  return (
+    <div className="widget">
+      <WidgetName name="running" />
+      <WidgetState state={isActive} type="on/off" />
+    </div>
   );
 };
 
-export default WidgetList;
+export default OnOffWidget;

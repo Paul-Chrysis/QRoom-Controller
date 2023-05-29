@@ -1,12 +1,15 @@
 import WidgetName from "../fifthLayer/WidgetName";
 import WidgetState from "../fifthLayer/WidgetState";
 
-const Widget = () => {
+const Widget = ({ widgetState }) => {
   return (
-    <>
-      <WidgetName />
-      <WidgetState />
-    </>
+    <div className="widget">
+      <WidgetName name={widgetState.widget_label} />
+      <WidgetState
+        state={widgetState.widget_state}
+        type={widgetState.widget_type}
+      />
+    </div>
   );
 };
 
