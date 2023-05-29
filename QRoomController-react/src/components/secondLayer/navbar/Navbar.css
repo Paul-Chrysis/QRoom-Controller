@@ -1,0 +1,25 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+.nav {
+  background-color: #333;
+  color: azure;
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  padding: 0 1rem;
+}
+
+.fanav {
+  color: inherit;
+  margin-top: 1.5vh;
+}
+
+.nav > img {
+  height: 5vh;
+}
