@@ -11,17 +11,17 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const RecognisedGesture = ({ gesture }) => {
   switch (gesture) {
-    case "openPalm":
+    case "Open_Palm":
       return <FontAwesomeIcon icon={faHand} />;
-    case "closedFist":
+    case "Closed_Fist":
       return <FontAwesomeIcon icon={faHandFist} />;
-    case "thumbsUp":
+    case "Thumb_Up":
       return <FontAwesomeIcon icon={faThumbsUp} />;
-    case "thumbsDown":
+    case "Thumb_Down":
       return <FontAwesomeIcon icon={faThumbsDown} />;
-    case "peace":
+    case "Victory":
       return <FontAwesomeIcon icon={faHandPeace} />;
-    case "pointUp":
+    case "Pointing_Up":
       return <FontAwesomeIcon icon={faHandPointUp} />;
     default:
       return <FontAwesomeIcon icon={faQuestion} />;

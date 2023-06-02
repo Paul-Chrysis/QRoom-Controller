@@ -1,5 +1,5 @@
 const Confidence = ({ confidence }) => {
-  return <p>{confidence}</p>;
+  return <p>{`${confidence}%`}</p>;
 };
 
 export default Confidence;

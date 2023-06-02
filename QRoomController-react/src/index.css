@@ -97,6 +97,10 @@ button {
   display: none;
 }
 
+.display {
+  display: block;
+}
+
 .valid {
   color: limegreen;
   margin-left: 0.25rem;
@@ -257,17 +261,18 @@ input:checked + .slider:before {
 .PossibleGestures {
   background-color: #ccc;
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
   padding: 10px;
 }
 
 .PossibleGesture {
+  flex: 1 1 20%;
   padding: 5px;
   color: darkslategray;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  width: 25%;
   border-radius: 5px;
   border: 2px solid darkslategray;
   text-align: center;
