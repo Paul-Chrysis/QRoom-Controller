@@ -1,4 +1,6 @@
 import { useRef, useState, useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { updateToken } from "../../features/Userdetails/UserDetailsSlice";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
 import React from "react";
@@ -8,6 +10,7 @@ import Logo from "../thirdLayer/Logo";
 const AUTHENTICATE_URL = "/api/v1/auth/authenticate";
 
 const Login = () => {
+  const dispatch = useDispatch();
   const { setAuth } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -41,11 +44,11 @@ const Login = () => {
           withCredentials: true,
         }
       );
-      console.log(JSON.stringify(response.data));
-      console.log(JSON.stringify(response.accessToken));
-      console.log(JSON.stringify(response));
+
       const token = response?.data?.token;
       setAuth({ user, pwd, token });
+      dispatch(updateToken(`Bearer ${token}`));
+
       setUser("");
       setPwd("");
       navigate(from, { replace: true });

@@ -1,4 +1,6 @@
 import { useRef, useState, useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { updateToken } from "../../features/Userdetails/UserDetailsSlice";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
   faCheck,
@@ -18,6 +20,7 @@ const NAME_REGEX = /^[A-Z]{1}[a-z]{2,15}$/;
 const REGISTER_URL = "/api/v1/auth/register";
 
 const Register = () => {
+  const dispatch = useDispatch();
   const { setAuth } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -111,11 +114,9 @@ const Register = () => {
           withCredentials: true,
         }
       );
-      console.log(JSON.stringify(response.data));
-      console.log(JSON.stringify(response.token));
-      console.log(JSON.stringify(response));
       const token = response?.data?.token;
       setAuth({ user, pwd, token });
+      dispatch(updateToken(token));
       navigate(from, { replace: true });
     } catch (err) {
       if (!err?.response) {

@@ -19,7 +19,6 @@ function App() {
             <Route path="/device" element={<DeviceBody />} />
             <Route path="/widget" element={<WidgetBody />} />
           </Route>
-          {/* <Route path="*" element={<Missing />} /> */}
         </Route>
       </Routes>
     </>

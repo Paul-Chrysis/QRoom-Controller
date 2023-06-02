@@ -50,10 +50,8 @@ public class DeviceService {
            if (currentState.isAdminOnly() && !isAdmin){
                 throw new RuntimeException();
            }
-            System.out.println(widget==null);
            if (widget == null){
                currentState.setDevice_isActive(!currentState.isDevice_isActive());
-
            }else{
            ArrayList<Widget> widgets = currentState.getDevice_widgets();
            for (int i=0; i<widgets.size(); i++){
