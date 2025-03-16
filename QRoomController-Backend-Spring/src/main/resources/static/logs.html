@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QRoom Controller - Interaction Logs</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .loading {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(0, 128, 128, 0.3);
+            border-radius: 50%;
+            border-top-color: #008080;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <header class="mb-8">
+            <h1 class="text-3xl font-bold text-teal-800">QRoom Controller - Interaction Logs</h1>
+            <p class="text-gray-600">View and analyze interaction logs from both gesture and AR interfaces</p>
+        </header>
+
+        <div class="mb-8 bg-white rounded-lg shadow p-6">
+            <h2 class="text-xl font-semibold mb-4 text-teal-700">Analytics</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h3 class="text-lg font-medium mb-2 text-gray-700">Success Rate by Interface</h3>
+                    <div class="h-64 relative">
+                        <canvas id="successRateChart"></canvas>
+                        <div id="successRateLoading" class="absolute inset-0 flex items-center justify-center">
+                            <div class="loading"></div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-lg font-medium mb-2 text-gray-700">Interaction Types Distribution</h3>
+                    <div class="h-64 relative">
+                        <canvas id="interactionTypeChart"></canvas>
+                        <div id="interactionTypeLoading" class="absolute inset-0 flex items-center justify-center">
+                            <div class="loading"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-8 bg-white rounded-lg shadow p-6">
+            <h2 class="text-xl font-semibold mb-4 text-teal-700">Filters</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Interface Type</label>
+                    <select id="interfaceTypeFilter" class="w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring focus:ring-teal-200">
+                        <option value="">All</option>
+                        <option value="gesture">Gesture</option>
+                        <option value="ar">AR</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Success</label>
+                    <select id="successFilter" class="w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring focus:ring-teal-200">
+                        <option value="">All</option>
+                        <option value="true">Success</option>
+                        <option value="false">Failure</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Date Range</label>
+                    <div class="flex space-x-2">
+                        <input type="date" id="startDateFilter" class="w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring focus:ring-teal-200">
+                        <input type="date" id="endDateFilter" class="w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring focus:ring-teal-200">
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-end space-x-2">
+                <button id="applyFiltersBtn" class="px-4 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500">
+                    Apply Filters
+                </button>
+                <button id="resetFiltersBtn" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400">
+                    Reset
+                </button>
+                <button id="exportCsvBtn" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
+                    Export CSV
+                </button>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+            <h2 class="text-xl font-semibold p-6 border-b text-teal-700">Interaction Logs</h2>
+            <div id="logsTableContainer" class="relative overflow-x-auto">
+                <div id="logsLoading" class="absolute inset-0 flex items-center justify-center bg-white bg-opacity-80">
+                    <div class="loading"></div>
+                </div>
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Task ID</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Interface</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Timestamp</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Interaction</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Success</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Device</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Widget</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Target</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actual</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time (ms)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logsTableBody" class="bg-white divide-y divide-gray-200">
+                        <!-- Logs will be inserted here -->
+                    </tbody>
+                </table>
+                <div id="noLogsMessage" class="hidden p-6 text-center text-gray-500">
+                    No logs found matching the current filters.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let allLogs = [];
+        let successRateChart = null;
+        let interactionTypeChart = null;
+        
+        // DOM elements
+        const logsTableBody = document.getElementById('logsTableBody');
+        const noLogsMessage = document.getElementById('noLogsMessage');
+        const logsLoading = document.getElementById('logsLoading');
+        const successRateLoading = document.getElementById('successRateLoading');
+        const interactionTypeLoading = document.getElementById('interactionTypeLoading');
+        
+        // Filter elements
+        const interfaceTypeFilter = document.getElementById('interfaceTypeFilter');
+        const successFilter = document.getElementById('successFilter');
+        const startDateFilter = document.getElementById('startDateFilter');
+        const endDateFilter = document.getElementById('endDateFilter');
+        const applyFiltersBtn = document.getElementById('applyFiltersBtn');
+        const resetFiltersBtn = document.getElementById('resetFiltersBtn');
+        const exportCsvBtn = document.getElementById('exportCsvBtn');
+        
+        // Initialize charts
+        function initCharts() {
+            const successRateCtx = document.getElementById('successRateChart').getContext('2d');
+            successRateChart = new Chart(successRateCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Gesture', 'AR'],
+                    datasets: [
+                        {
+                            label: 'Success Rate (%)',
+                            data: [0, 0],
+                            backgroundColor: ['rgba(0, 128, 128, 0.6)', 'rgba(75, 192, 192, 0.6)'],
+                            borderColor: ['rgb(0, 128, 128)', 'rgb(75, 192, 192)'],
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'Success Rate (%)'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            const interactionTypeCtx = document.getElementById('interactionTypeChart').getContext('2d');
+            interactionTypeChart = new Chart(interactionTypeCtx, {
+                type: 'pie',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        data: [],
+                        backgroundColor: [
+                            'rgba(0, 128, 128, 0.6)',
+                            'rgba(75, 192, 192, 0.6)',
+                            'rgba(54, 162, 235, 0.6)',
+                            'rgba(153, 102, 255, 0.6)',
+                            'rgba(255, 159, 64, 0.6)',
+                            'rgba(255, 99, 132, 0.6)',
+                            'rgba(255, 205, 86, 0.6)'
+                        ],
+                        borderColor: [
+                            'rgb(0, 128, 128)',
+                            'rgb(75, 192, 192)',
+                            'rgb(54, 162, 235)',
+                            'rgb(153, 102, 255)',
+                            'rgb(255, 159, 64)',
+                            'rgb(255, 99, 132)',
+                            'rgb(255, 205, 86)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right'
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Fetch logs from API
+        async function fetchLogs() {
+            try {
+                logsLoading.style.display = 'flex';
+                successRateLoading.style.display = 'flex';
+                interactionTypeLoading.style.display = 'flex';
+                
+                const response = await fetch('/api/v1/logs', {
+                    headers: {
+                        'Authorization': getAuthToken()
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to fetch logs');
+                }
+                
+                allLogs = await response.json();
+                displayLogs(allLogs);
+                updateCharts(allLogs);
+                
+                logsLoading.style.display = 'none';
+                successRateLoading.style.display = 'none';
+                interactionTypeLoading.style.display = 'none';
+            } catch (error) {
+                console.error('Error fetching logs:', error);
+                logsLoading.style.display = 'none';
+                successRateLoading.style.display = 'none';
+                interactionTypeLoading.style.display = 'none';
+                alert('Error fetching logs. Please check your authentication and try again.');
+            }
+        }
+        
+        // Display logs in table
+        function displayLogs(logs) {
+            logsTableBody.innerHTML = '';
+            
+            if (logs.length === 0) {
+                noLogsMessage.classList.remove('hidden');
+                return;
+            }
+            
+            noLogsMessage.classList.add('hidden');
+            
+            logs.forEach(log => {
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${log.taskId || '-'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${log.interfaceType || '-'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatDate(log.timestamp)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${log.interactionType || '-'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${log.success ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                            ${log.success ? 'Success' : 'Failure'}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${log.deviceId || '-'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${log.widgetLabel || '-'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${log.targetValue || '-'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${log.actualValue || '-'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${log.timeElapsed || '-'}</td>
+                `;
+                
+                logsTableBody.appendChild(row);
+            });
+        }
+        
+        // Update charts with log data
+        function updateCharts(logs) {
+            // Success rate by interface
+            const gestureInteractions = logs.filter(log => log.interfaceType === 'gesture');
+            const arInteractions = logs.filter(log => log.interfaceType === 'ar');
+            
+            const gestureSuccessRate = gestureInteractions.length > 0 
+                ? (gestureInteractions.filter(log => log.success).length / gestureInteractions.length) * 100 
+                : 0;
+                
+            const arSuccessRate = arInteractions.length > 0 
+                ? (arInteractions.filter(log => log.success).length / arInteractions.length) * 100 
+                : 0;
+            
+            successRateChart.data.datasets[0].data = [gestureSuccessRate, arSuccessRate];
+            successRateChart.update();
+            
+            // Interaction types distribution
+            const interactionTypes = {};
+            logs.forEach(log => {
+                if (log.interactionType) {
+                    interactionTypes[log.interactionType] = (interactionTypes[log.interactionType] || 0) + 1;
+                }
+            });
+            
+            const labels = Object.keys(interactionTypes);
+            const data = Object.values(interactionTypes);
+            
+            interactionTypeChart.data.labels = labels;
+            interactionTypeChart.data.datasets[0].data = data;
+            interactionTypeChart.update();
+        }
+        
+        // Apply filters to logs
+        function applyFilters() {
+            const interfaceType = interfaceTypeFilter.value;
+            const success = successFilter.value;
+            const startDate = startDateFilter.value ? new Date(startDateFilter.value) : null;
+            const endDate = endDateFilter.value ? new Date(endDateFilter.value) : null;
+            
+            // If end date is provided, set it to the end of the day
+            if (endDate) {
+                endDate.setHours(23, 59, 59, 999);
+            }
+            
+            let filteredLogs = [...allLogs];
+            
+            if (interfaceType) {
+                filteredLogs = filteredLogs.filter(log => log.interfaceType === interfaceType);
+            }
+            
+            if (success !== '') {
+                const successBool = success === 'true';
+                filteredLogs = filteredLogs.filter(log => log.success === successBool);
+            }
+            
+            if (startDate) {
+                filteredLogs = filteredLogs.filter(log => new Date(log.timestamp) >= startDate);
+            }
+            
+            if (endDate) {
+                filteredLogs = filteredLogs.filter(log => new Date(log.timestamp) <= endDate);
+            }
+            
+            displayLogs(filteredLogs);
+            updateCharts(filteredLogs);
+        }
+        
+        // Reset filters
+        function resetFilters() {
+            interfaceTypeFilter.value = '';
+            successFilter.value = '';
+            startDateFilter.value = '';
+            endDateFilter.value = '';
+            
+            displayLogs(allLogs);
+            updateCharts(allLogs);
+        }
+        
+        // Export logs to CSV
+        function exportToCsv() {
+            if (allLogs.length === 0) {
+                alert('No logs to export');
+                return;
+            }
+            
+            const headers = ['ID', 'Task ID', 'Interface Type', 'Timestamp', 'Interaction Type', 
+                            'Success', 'Device ID', 'Widget Label', 'Target Value', 'Actual Value', 
+                            'Time Elapsed', 'User ID', 'Additional Info'];
+                            
+            const rows = allLogs.map(log => [
+                log.id || '',
+                log.taskId || '',
+                log.interfaceType || '',
+                log.timestamp || '',
+                log.interactionType || '',
+                log.success !== undefined ? log.success : '',
+                log.deviceId || '',
+                log.widgetLabel || '',
+                log.targetValue || '',
+                log.actualValue || '',
+                log.timeElapsed || '',
+                log.userId || '',
+                log.additionalInfo || ''
+            ]);
+            
+            const csvContent = [
+                headers.join(','),
+                ...rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+            ].join('\n');
+            
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            link.setAttribute('download', `qroom_logs_${new Date().toISOString().slice(0, 10)}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        
+        // Helper function to format date
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            const date = new Date(dateString);
+            return date.toLocaleString();
+        }
+        
+        // Helper function to get auth token from URL or localStorage
+        function getAuthToken() {
+            // Try to get token from URL query parameter
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = urlParams.get('token');
+            
+            if (token) {
+                // Save token to localStorage for future use
+                localStorage.setItem('authToken', token);
+                return `Bearer ${token}`;
+            }
+            
+            // Try to get token from localStorage
+            const storedToken = localStorage.getItem('authToken');
+            if (storedToken) {
+                return `Bearer ${storedToken}`;
+            }
+            
+            // If no token found, prompt user
+            const userToken = prompt('Please enter your authentication token:');
+            if (userToken) {
+                localStorage.setItem('authToken', userToken);
+                return `Bearer ${userToken}`;
+            }
+            
+            return '';
+        }
+        
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            initCharts();
+            fetchLogs();
+            
+            applyFiltersBtn.addEventListener('click', applyFilters);
+            resetFiltersBtn.addEventListener('click', resetFilters);
+            exportCsvBtn.addEventListener('click', exportToCsv);
+        });
+    </script>
+</body>
+</html>

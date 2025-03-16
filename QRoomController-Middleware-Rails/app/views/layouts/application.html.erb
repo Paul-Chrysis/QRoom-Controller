@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= content_for(:title) || "Q Room Controller Middleware Rails" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= yield :head %>
+
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+      <!-- see https://github.com/rdub80/aframe-gui/issues/64 -->
+  <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+  <!-- ar.js library -->
+  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+  <!-- aframe-gui library -->
+  <script src="https://rawgit.com/rdub80/aframe-gui/master/dist/aframe-gui.min.js"></script>
+  <!-- dat-gui library (required by aframe-gui) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.5.1/dat.gui.min.js" type="text/javascript"></script>
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+<style>
+  .buttons {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 5em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+  }
+
+  .say-hi-button {
+    padding: 0.25em;
+    border-radius: 4px;
+    border: none;
+    background: white;
+    color: black;
+    width: 4em;
+    height: 2em;
+  }
+</style>
+
+
+<%
+=begin%>
+ <script>
+    //example scripting for creating an overlaid (2D) UI
+    window.onload = function () {
+      document
+        .querySelector(".say-hi-button")
+        .addEventListener("click", function () {
+          alert("Hi there!");
+        });
+
+
+    };
+
+    //component registration for in-built events (this case, fired when marker is detected)
+    AFRAME.registerComponent('markerhandler', {
+      init: function () {
+        console.log("markerhandler component initialized");
+        this.el.sceneEl.addEventListener('markerFound', (evt) => {
+          console.log("marker found");
+          console.log(evt);
+        })
+      }
+    });
+
+    //example of adding a scene component (this case, mouse cursor and a UI widget) dynamically, after scene is loaded
+    AFRAME.registerComponent('dynamic-elements', {
+      init: function () {
+
+              console.log("dynamic-elements component initialized");
+              //best to define the mouse cursor after the scene initialisation, to get appropriate
+              //viewport coordinates...
+              const scene = AFRAME.scenes[0];
+              const mouseCursor = document.createElement('a-entity');
+              mouseCursor.setAttribute('cursor', 'rayOrigin: mouse; fuse: false');
+              mouseCursor.setAttribute('raycaster', 'objects: [gui-interactable]');
+              scene.appendChild(mouseCursor);
+
+              const controlpanel = document.getElementById('thepanel');
+              const widget = document.createElement('a-gui-label');
+              widget.setAttribute('width', '1.25');
+              widget.setAttribute('height', '0.25');
+              widget.setAttribute('value', 'dynamic widget');
+              widget.setAttribute('font-size', '0.15');
+              widget.setAttribute('line-height', '0.3');
+              widget.setAttribute('letter-spacing', '0.0');
+              widget.setAttribute('margin', '0 0 0.1 0');
+              controlpanel.appendChild(widget);
+      },
+    });
+
+</script> 
+<%
+=end%>
+
+
+<%
+=begin%>
+ <script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const marker = document.querySelector("#themarker");
+
+    marker.addEventListener("markerFound", function() {
+      let markerId = marker.getAttribute("value"); // Get detected marker ID
+      console.log("Detected marker ID:", markerId);
+
+      //updateMarkerLayout(markerId);
+    });
+
+    function updateMarkerLayout(id) {
+      const container = document.querySelector("#dynamic-container");
+      container.innerHTML = ""; // Clear previous layout
+
+      let newLayout = "";
+      switch (id) {
+        case "5":
+          newLayout = `
+            <a-gui-flex-container flex-direction="column" justify-content="center" align-items="normal"
+              component-padding="0.1" opacity="0.6" width="1.75" height="3" panel-color="#fff" panel-rounded="0.1"
+              position="0 0.5 0" rotation="-90 0 0">
+              
+              <a-gui-label width="1.25" height="0.25" value="Device A" font-size="0.15"></a-gui-label>
+              <a-gui-toggle width="1.25" height="0.25" value="Toggle A"></a-gui-toggle>
+            </a-gui-flex-container>
+          `;
+          break;
+        case "6":
+          newLayout = `
+            <a-gui-flex-container flex-direction="row" justify-content="center" align-items="normal"
+              component-padding="0.1" opacity="0.6" width="2" height="2.5" panel-color="#ddd" panel-rounded="0.2"
+              position="0 0.5 0" rotation="-90 0 0">
+              
+              <a-gui-slider width="1.5" height="0.25" percent="0.5"></a-gui-slider>
+              <a-gui-label width="1.25" height="0.25" value="Device B"></a-gui-label>
+            </a-gui-flex-container>
+          `;
+          break;
+        default:
+          newLayout = `<a-gui-label width="1.25" height="0.25" value="Unknown Device"></a-gui-label>`;
+      }
+
+      container.innerHTML = newLayout;
+    }
+  });
+</script> 
+<%
+=end%>
+
+  </head>
+  <body>
+    <%= yield %>
+    <%
+=begin%>
+ <div class="buttons">
+      <button class="say-hi-button">SAY HI!</button>
+    </div> 
+<%
+=end%>
+
+    <!-- html for the setup of the AR environment -->
+    <!-- everything needs to be in a scene -->
+    <!-- 2D marker types found here https://github.com/nicolocarpignoli/artoolkit-barcode-markers-collection -->
+<%
+=begin%>
+ <a-scene embedded arjs='sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 4x4_BCH_13_9_3; emitevents:true;'>
+  <a-marker id="themarker" type='barcode' value='5' markerhandler>
+    <a-entity id="dynamic-container"></a-entity>
+  </a-marker>
+
+  <a-entity camera="fov:40" id="cam"></a-entity>
+</a-scene> 
+<%
+=end%>
+
+
+  </body>
+</html>

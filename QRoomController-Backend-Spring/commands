@@ -1,0 +1,19 @@
+## pull mongodb image
+
+-docker pull mongo
+
+## create mongodb container
+
+-docker run -d -p 27017:27017 --name=QRoomController-mongo mongo:latest
+
+## create docker image of the back-end
+
+-docker build -t qroomcontroller-spring:1.0 .
+
+## create docker container of the back-end and link it with the mongo container
+
+docker run -p 8080:8080 --name qroomcontroller --link QRoomController-mongo -d qroomcontroller-spring:1.0
+
+# you can see the containers logs using the following command
+
+docker logs qroomcontroller
