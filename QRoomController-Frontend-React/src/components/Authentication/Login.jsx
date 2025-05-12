@@ -10,7 +10,10 @@ import React from "react";
 import axios from "../../api/axios";
 import Logo from "../thirdLayer/Logo";
 
-import { Button, Card, Label, TextInput } from "flowbite-react";
+import Card from "../ui/Card";
+import Button from "../ui/Button";
+import TextInput from "../ui/TextInput";
+import Label from "../ui/Label";
 
 const AUTHENTICATE_URL = "/api/v1/auth/authenticate";
 
@@ -25,6 +28,7 @@ const Login = () => {
   const [user, setUser] = useState("");
   const [pwd, setPwd] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     userRef.current.focus();
@@ -36,6 +40,8 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
+    
     try {
       const response = await axios.post(
         AUTHENTICATE_URL,
@@ -66,63 +72,97 @@ const Login = () => {
       } else if (err.response?.status === 403) {
         setErrorMsg("Account does not exist");
       } else if (err.response?.status === 401) {
-        setErrorMsg("Anauthorized");
+        setErrorMsg("Unauthorized");
       } else {
         setErrorMsg("Login Failed");
       }
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="container mx-auto h-dvh content-center">
-      <Card className="max-w-sm justify-items-center mx-auto shadow-2xl mt-5">
-        <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-          <p
-            ref={errorRef}
-            className={
-              errorMsg
-                ? "border rounded-lg border-red-500 text-red-500 text-center py-1"
-                : "hidden"
-            }
-          >
-            {errorMsg}
-          </p>
-          <Logo></Logo>
-          <div>
-            <div className="mb-2 block">
-              <Label htmlFor="username" value="Username" />
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-primary-50 to-primary-100 py-12 px-4 sm:px-6 lg:px-8">
+      <Card className="max-w-md w-full shadow-card" rounded="xl">
+        <Card.Body className="p-8">
+          <div className="text-center mb-6">
+            <div className="w-32 mx-auto mb-4">
+              <Logo />
             </div>
+            <h2 className="text-3xl font-bold text-primary-800">Welcome Back</h2>
+            <p className="text-gray-600 mt-2">Sign in to your account</p>
+          </div>
+          
+          {errorMsg && (
+            <div 
+              ref={errorRef}
+              className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg"
+              role="alert"
+            >
+              <p className="font-medium">{errorMsg}</p>
+            </div>
+          )}
+          
+          <form className="space-y-6" onSubmit={handleSubmit}>
             <TextInput
+              label="Username"
               id="username"
               type="text"
               required
               ref={userRef}
               onChange={(e) => setUser(e.target.value)}
               value={user}
+              placeholder="Enter your username"
             />
-          </div>
-          <div>
-            <div className="mb-2 block">
-              <Label htmlFor="password" value="Password" />
-            </div>
+            
             <TextInput
+              label="Password"
               id="password"
               type="password"
               onChange={(e) => setPwd(e.target.value)}
               value={pwd}
               required
+              placeholder="Enter your password"
             />
-          </div>
-          <Button type="submit">Login</Button>
-          <p>
-            Need an Account?
-            <span className="inline-block">
-              <Link to="/register" className="underline font-semibold">
-                Sign Up
-              </Link>
-            </span>
-          </p>
-        </form>
+            
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <input
+                  id="remember-me"
+                  name="remember-me"
+                  type="checkbox"
+                  className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                />
+                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
+                  Remember me
+                </label>
+              </div>
+              
+              <div className="text-sm">
+                <a href="#" className="font-medium text-primary-600 hover:text-primary-500">
+                  Forgot password?
+                </a>
+              </div>
+            </div>
+            
+            <Button 
+              type="submit" 
+              className="w-full" 
+              size="lg"
+              disabled={isLoading}
+            >
+              {isLoading ? 'Signing in...' : 'Sign in'}
+            </Button>
+            
+            <div className="text-center mt-4">
+              <p className="text-sm text-gray-600">
+                Need an account?{' '}
+                <Link to="/register" className="font-medium text-primary-600 hover:text-primary-500">
+                  Sign up
+                </Link>
+              </p>
+            </div>
+          </form>
+        </Card.Body>
       </Card>
     </div>
   );

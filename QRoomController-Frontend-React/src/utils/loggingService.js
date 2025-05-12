@@ -31,7 +31,7 @@ const loggingService = {
       // Make API call to log the interaction
       const response = await axios.post('/api/v1/logs', logData, {
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Authorization': `${token}`
         }
       });
       

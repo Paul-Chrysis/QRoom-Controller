@@ -1,11 +1,10 @@
 import { useEffect } from "react";
-
 import { useSelector, useDispatch } from "react-redux";
 import { fetchDevice } from "../../features/fetchDevice/fetchDeviceSlice";
 
 import DeviceName from "../thirdLayer/DeviceName";
 import WidgetList from "../thirdLayer/WidgetList";
-import { Card } from "flowbite-react";
+import Card from "../ui/Card";
 
 function DeviceBody() {
   const currentDeviceState = useSelector((state) => state.device.device);

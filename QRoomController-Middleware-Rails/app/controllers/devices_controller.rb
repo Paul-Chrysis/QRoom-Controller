@@ -2,17 +2,26 @@ class DevicesController < ApplicationController
   protect_from_forgery with: :null_session
   before_action :authenticate_user
   def index
-    puts session[:token]
-    token = session[:token] || request.headers['Authorization'].split(' ').last
+    # Get token from URL parameter or Authorization header
+    token = params[:token] || (request.headers['Authorization'] ? request.headers['Authorization'].split(' ').last : nil)
+    
     if token
+      # Store token in Redis
+      RedisDeviceCacheService.store_token(request.session.id, token)
+      puts "Using token: #{token}"
+      
       devices = QroomControllerService.new.get_devices(token)
       if devices
         formatted_devices = devices.map do |json_str|
           parsed_device = JSON.parse(json_str)
           { id: parsed_device['_id']['$oid'] }
         end
-        session[:devices] = formatted_devices.map{|d| d.deep_symbolize_keys}
-        puts "session[:devices]: #{session[:devices]}" 
+        
+        # Store formatted devices in Redis
+        markers = formatted_devices.map{|d| d.deep_symbolize_keys}
+        RedisDeviceCacheService.store_markers(token, markers)
+        
+        puts "Stored markers in Redis for token: #{token}" 
         redirect_to scene_path
       else
         render json: { error: 'Failed to retrieve devices' }, status: :unprocessable_entity
@@ -23,15 +32,27 @@ class DevicesController < ApplicationController
   end
 
   def show
-    token = session[:token] || request.headers['Authorization'].split(' ').last
+    # Get token from URL parameter or Authorization header
+    token = params[:token] || (request.headers['Authorization'] ? request.headers['Authorization'].split(' ').last : nil) || RedisDeviceCacheService.get_token(request.session.id)
     device_id = params[:id].to_i
     start_time = Time.now.to_f * 1000 # Convert to milliseconds
     
-    puts "session[:devices]: #{session[:devices]}"
-    puts "session[:devices][device_id]: #{session[:devices][device_id]}"
-    translated_device_id = session[:devices][device_id]["id"]
+    # Store token in Redis
+    if token
+      RedisDeviceCacheService.store_token(request.session.id, token)
+      puts "Using token: #{token}"
+    end
+    
+    # Get markers from Redis
+    markers = RedisDeviceCacheService.get_markers(token)
+    puts "Markers from Redis: #{markers}"
+    puts "Marker for device_id #{device_id}: #{markers[device_id]}"
+    
+    translated_device_id = markers[device_id]["id"]
     puts "translated_device_id: #{translated_device_id}"
-    session[:device_id] = translated_device_id
+    
+    # Store device ID in Redis
+    RedisDeviceCacheService.store_device_id(token, translated_device_id)
     
     if token && device_id
       service = QroomControllerService.new
@@ -72,12 +93,22 @@ class DevicesController < ApplicationController
   end
 
   def update_state
-    Rails.logger.info "Starting update_state for device #{session[:device_id]}"
-    device_id = session[:device_id]
-    token = session[:token]
+    # Get token from URL parameter or Authorization header
+    token = params[:token] || (request.headers['Authorization'] ? request.headers['Authorization'].split(' ').last : nil) || RedisDeviceCacheService.get_token(request.session.id)
+    
+    # Get device ID from Redis
+    device_id = RedisDeviceCacheService.get_device_id(token)
+    Rails.logger.info "Starting update_state for device #{device_id}"
+    
     state = params[:device] unless params[:device].blank?
+    
+    # Store token in Redis
+    if token
+      RedisDeviceCacheService.store_token(request.session.id, token)
+      Rails.logger.info "Using token: #{token}"
+    end
+    
     Rails.logger.info "state: #{state}"
-    Rails.logger.info "token: #{token}"
     
     begin
       service = QroomControllerService.new

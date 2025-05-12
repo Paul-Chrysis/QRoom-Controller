@@ -1,11 +1,12 @@
 import ScanQRBody from "../secondLayer/ScanQRBody";
+import SelectionPage from "../secondLayer/SelectionPage";
 import DeviceBody from "../secondLayer/DeviceBody";
 import WidgetBody from "../secondLayer/WidgetBody";
 import Register from "../Authentication/Register";
 import Login from "../Authentication/Login";
 import RequireAuth from "../RequireAuth";
 import Layout from "./Layout";
-// import LogViewer from "../LogViewer/LogViewer";
+import LogViewer from "../LogViewer/LogViewer";
 import { Route, Routes } from "react-router-dom";
 
 function App() {
@@ -16,10 +17,12 @@ function App() {
         <Route path="register" element={<Register />} />
         <Route path="/" element={<Layout />}>
           <Route element={<RequireAuth />}>
-            <Route path="/" element={<ScanQRBody />} />
+            <Route path="/" element={<SelectionPage />} />
+            <Route path="/gesture" element={<ScanQRBody />} />
+            <Route path="/ar" element={<ScanQRBody />} />
             <Route path="/device" element={<DeviceBody />} />
             <Route path="/widget" element={<WidgetBody />} />
-            {/* <Route path="/logs" element={<LogViewer />} /> */}
+            <Route path="/logs" element={<LogViewer />} />
           </Route>
         </Route>
       </Routes>

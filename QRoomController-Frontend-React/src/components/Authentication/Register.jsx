@@ -11,7 +11,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import useAuth from "../../hooks/useAuth";
 import axios from "../../api/axios";
 import Logo from "../thirdLayer/Logo";
-import { Button, Card, Label, TextInput } from "flowbite-react";
+import Button from "../ui/Button";
+import Card from "../ui/Card";
+import Label from "../ui/Label";
+import TextInput from "../ui/TextInput";
 
 const USER_REGEX = /^[a-zA-Z][a-zA-Z0-9-_]{3,23}$/;
 const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;

@@ -8,9 +8,11 @@ class SessionsController < ApplicationController
     password = "adminpass" #params[:password]
     token = QroomControllerService.new.authenticate(username, password)
     if token
-      session[:token] = token
-      redirect_to root_path, notice: "Logged in successfully"
+      # Store token in Redis
+      RedisDeviceCacheService.store_token(request.session.id, token)
       puts "Logged in successfully"
+      puts "Token stored in Redis: #{token}"
+      redirect_to root_path, notice: "Logged in successfully"
     else
       puts "Invalid username or password"
       flash.now[:alert] = "Invalid username or password"
@@ -19,7 +21,12 @@ class SessionsController < ApplicationController
   end
 
   def destroy
-    session.delete(:token)
+    # Get token from Redis
+    token = RedisDeviceCacheService.get_token(request.session.id)
+    
+    # Clear all data for this token
+    RedisDeviceCacheService.clear_all(token) if token
+    
     redirect_to new_session_path, notice: "Logged out successfully"
   end
 end

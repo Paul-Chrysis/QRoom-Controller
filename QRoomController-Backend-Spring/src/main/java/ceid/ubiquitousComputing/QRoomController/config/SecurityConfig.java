@@ -36,10 +36,10 @@ public class SecurityConfig {
                         .permitAll()
                         .requestMatchers("/logs.html")
                         .permitAll()
+                        .requestMatchers("api/v1/logs/**")
+                        .permitAll()
                         .requestMatchers("api/v1/user/**")
                         .hasAuthority("ADMIN")
-                        .requestMatchers("api/v1/logs/**")
-                        .authenticated()
                         .anyRequest()
                         .authenticated())
                 .sessionManagement(management -> management
@@ -53,7 +53,8 @@ public class SecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource(){
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173","http://192.168.100.5:5173","https://192.168.100.5:5173", "http://localhost:3000","http://192.168.100.5:3000","https://192.168.100.5:3000"));
+        //configuration.setAllowedOrigins(Arrays.asList("*")); //"http://localhost:5173","http://192.168.100.5:5173","https://192.168.100.5:5173", "http://localhost:3000","http://192.168.100.5:3000","https://192.168.100.5:3000"
+        configuration.setAllowedOriginPatterns(Arrays.asList("*"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization","content-type"));
         configuration.setAllowCredentials(true);

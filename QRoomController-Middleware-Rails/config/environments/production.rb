@@ -93,4 +93,8 @@ Rails.application.configure do
   # ]
   # Skip DNS rebinding protection for the default health check endpoint.
   # config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
+  
+  # Redis configuration
+  config.redis_host = ENV['REDIS_HOST'] || 'localhost'
+  config.redis_port = ENV['REDIS_PORT'] || 6379
 end

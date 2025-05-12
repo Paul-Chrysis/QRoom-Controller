@@ -26,7 +26,7 @@ class LoggingService {
       }
 
       // Make API call to log the interaction
-      const response = await fetch('http://localhost:8080/api/v1/logs', {
+      const response = await fetch('http://http://172.25.160.1:8080/api/v1/logs', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -1,6 +1,6 @@
 class QroomControllerService
   include HTTParty
-  base_uri 'http://localhost:8080/api/v1' # Replace with your Spring Boot backend URL
+  base_uri ENV['QROOM_CONTROLLER_API_URL'] || 'http://localhost:8080/api/v1'
   debug_output $stdout
 
   def initialize
@@ -8,16 +8,30 @@ class QroomControllerService
   end
 
   def get_devices(token)
-    options_with_auth = @options.merge(headers: @options[:headers].merge('Authorization' => "Bearer #{token}"))
+    # Try to get from Redis first
+    cached_devices = RedisDeviceCacheService.get_devices(token)
+    return cached_devices if cached_devices.present?
+    
+    # If not in cache, fetch from API
+    options_with_auth = @options.merge(headers: @options[:headers].merge('Authorization' => format_token(token)))
     response = self.class.get('/device/devices', options_with_auth)
-    log_response(response)
-    response.parsed_response
+    # log_response(response)
+    
+    if response.success?
+      devices = response.parsed_response
+      # Store in Redis if successful
+      RedisDeviceCacheService.store_devices(token, devices)
+      return devices
+    end
+    
+    # Return empty array if API call fails
+    []
   end
 
   def get_device(token, device_id)
-    options_with_auth = @options.merge(headers: @options[:headers].merge('Authorization' => "Bearer #{token}"))
+    options_with_auth = @options.merge(headers: @options[:headers].merge('Authorization' => format_token(token)))
     response = self.class.get("/device/#{device_id}", options_with_auth)
-    log_response(response)
+    # log_response(response)
     response.parsed_response
   end
 
@@ -28,7 +42,10 @@ class QroomControllerService
     response = self.class.put(
       "/device/#{device_id}",
       body: state.to_json,
-      headers: headers_with_token(token),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': format_token(token)
+      },
       debug_output: $stdout
     )
     
@@ -64,7 +81,7 @@ class QroomControllerService
   def authenticate(username, password)
     body = { username: username, password: password }.to_json
     response = self.class.post('/auth/authenticate', @options.merge(body: body))
-    log_response(response)
+    # log_response(response)
     if response.success?
       response.parsed_response['token']
     else
@@ -81,7 +98,10 @@ class QroomControllerService
       response = self.class.post(
         "/logs",
         body: log_data.to_json,
-        headers: headers_with_token(token)
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': format_token(token)
+        }
       )
       
       Rails.logger.info "Log sent to Spring API: #{log_data.to_json}"
@@ -102,10 +122,15 @@ class QroomControllerService
     Rails.logger.info "Response headers: #{response.headers.inspect}"
   end
 
+  def format_token(token)
+    # Check if token already has Bearer prefix
+    token.to_s.start_with?('Bearer ') ? token : "Bearer #{token}"
+  end
+
   def headers_with_token(token)
     {
       'Content-Type': 'application/json',
-      'Authorization': "Bearer #{token}"
+      'Authorization': token
     }
   end
 end

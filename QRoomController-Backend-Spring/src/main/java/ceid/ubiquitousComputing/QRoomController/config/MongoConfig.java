@@ -4,6 +4,7 @@ import ceid.ubiquitousComputing.QRoomController.enums.Role;
 import ceid.ubiquitousComputing.QRoomController.model.*;
 import ceid.ubiquitousComputing.QRoomController.repository.DeviceRepository;
 import ceid.ubiquitousComputing.QRoomController.repository.UserRepository;
+import ceid.ubiquitousComputing.QRoomController.repository.InteractionLogRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,7 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.ArrayList;
 
-@EnableMongoRepositories( basePackageClasses = {UserRepository.class, DeviceRepository.class})
+@EnableMongoRepositories( basePackageClasses = {UserRepository.class, DeviceRepository.class, InteractionLogRepository.class})
 @Configuration
 public class MongoConfig {
     private final PasswordEncoder passwordEncoder;

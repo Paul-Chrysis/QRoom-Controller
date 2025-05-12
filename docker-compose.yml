@@ -1,0 +1,74 @@
+version: '3.8'
+services:
+  spring-api:
+    build: 
+      context: ./QRoomController-Backend-Spring
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATA_MONGODB_HOST=QRoomController-mongo
+      - SPRING_DATA_MONGODB_PORT=27017
+      - SPRING_DATA_MONGODB_DATABASE=QRC
+    depends_on:
+      - QRoomController-mongo
+    networks:
+      - qroom-network
+
+  rails-middleware:
+    build: 
+      context: ./QRoomController-Middleware-Rails
+    ports:
+      - "3000:3000"
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - RAILS_ENV=development
+      - QROOM_CONTROLLER_API_URL=http://spring-api:8080/api/v1
+    command: bin/rails server -b 0.0.0.0
+    depends_on:
+      - redis
+      - spring-api
+    networks:
+      - qroom-network
+
+  react-frontend:
+    build:
+      context: ./QRoomController-Frontend-React
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://192.168.100.5:8080
+    volumes:
+      - ./QRoomController-Frontend-React:/app
+      - /app/node_modules
+    depends_on:
+      - spring-api
+    networks:
+      - qroom-network
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - qroom-network
+
+  QRoomController-mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb-data:/data/db
+    networks:
+      - qroom-network
+
+networks:
+  qroom-network:
+    driver: bridge
+
+volumes:
+  redis-data:
+  mongodb-data:

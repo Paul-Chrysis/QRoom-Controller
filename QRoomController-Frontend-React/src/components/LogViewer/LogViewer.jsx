@@ -35,7 +35,7 @@ const LogViewer = () => {
       setLoading(true);
       const response = await axios.get('/api/v1/logs', {
         headers: {
-          'Authorization': `Bearer ${auth?.accessToken}`
+          'Authorization': `${auth?.accessToken}`
         }
       });
       setLogs(response.data);
@@ -52,7 +52,7 @@ const LogViewer = () => {
     try {
       const response = await axios.get('/api/v1/logs/analytics', {
         headers: {
-          'Authorization': `Bearer ${auth?.accessToken}`
+          'Authorization': `${auth?.accessToken}`
         }
       });
       setAnalytics(response.data);
@@ -93,7 +93,7 @@ const LogViewer = () => {
       
       const response = await axios.get(url, {
         headers: {
-          'Authorization': `Bearer ${auth?.accessToken}`
+          'Authorization': `${auth?.accessToken}`
         }
       });
       setLogs(response.data);

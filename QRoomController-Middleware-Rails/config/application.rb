@@ -29,8 +29,9 @@ module QRoomControllerMiddlewareRails
     config.autoload_lib(ignore: %w[assets tasks])
 
     config.middleware.use ActionDispatch::Cookies
-    config.middleware.use ActionDispatch::Session::CookieStore, key: '_your_app_name_session'
-
+    # config.middleware.use ActionDispatch::Session::CookieStore, key: '_your_app_name_session'
+    config.action_dispatch.default_headers.delete('X-Frame-Options')
+    config.action_dispatch.cookies_same_site_protection = :none
     # Configuration for the application, engines, and railties goes here.
     #
     # These settings can be overridden in specific environments using the files
